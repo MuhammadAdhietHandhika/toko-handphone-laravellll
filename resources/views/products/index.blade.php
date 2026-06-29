@@ -6,8 +6,65 @@
 </head>
 <body class="p-5">
     @include('navbar')
-    <button onclick="toggle_model()" class="bg-blue-500 text-white px-4 py-2 rounded-2xl">+ tambah item</button>
-    <table class="table-auto w-full mt-5">
+    <div class="grid grid-cols-3 gap-4 mb-6">
+
+    <div class="bg-blue-500 text-white rounded-lg shadow p-5">
+        <p class="text-sm">Total Produk</p>
+        <h2 class="text-3xl font-bold">
+            {{ $totalProduk }}
+        </h2>
+    </div>
+
+    <div class="bg-green-500 text-white rounded-lg shadow p-5">
+        <p class="text-sm">Total Stok</p>
+        <h2 class="text-3xl font-bold">
+            {{ $totalStok }}
+        </h2>
+    </div>
+
+    <div class="bg-yellow-500 text-white rounded-lg shadow p-5">
+        <p class="text-sm">Total Nilai Stok</p>
+        <h2 class="text-2xl font-bold">
+            Rp {{ number_format($totalNilaiStok,0,',','.') }}
+        </h2>
+    </div>
+
+</div>
+
+    <div class="flex justify-between items-center mb-5">
+
+        <div class="flex gap-2">
+            <button onclick="toggle_model()" class="bg-blue-500 text-white px-4 py-2 rounded">
+                + tambah item
+            </button>
+
+            <a href="{{ route('products.pdf') }}"
+                class="bg-red-500 text-white px-4 py-2 rounded font-medium flex items-center gap-1 hover:bg-red-700 transition">
+                <span class="material-icons text-sm">picture_as_pdf</span>
+                Simpan Sebagai PDF
+            </a>
+        </div>
+
+        <form action="{{ route('products.index') }}" method="GET" class="flex gap-2">
+
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Cari nama barang..."
+                class="border rounded px-3 py-2 w-72">
+
+            <button
+                type="submit"
+                class="bg-blue-500 text-white px-4 rounded">
+                Cari
+            </button>
+
+        </form>
+
+    </div>
+
+    <table class="table-auto w-full">
         <thead>
             <tr class="bg-gray-300">
                 <th class="border p-2">Nama item</th>
@@ -113,7 +170,6 @@
             document.getElementById('edit_deskripsi').value = item.deskripsi;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-
 
         }
 

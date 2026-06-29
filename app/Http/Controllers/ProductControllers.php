@@ -3,18 +3,38 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Product;
+
 
 class ProductControllers extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
 {
-    $products = \App\Models\Product::all();
-    return view('products.index', compact('products'));
-}
+    $search = $request->search;
 
+    $products = Product::when($search, function ($query) use ($search) {
+        return $query->where('nama_barang', 'like', '%' . $search . '%');
+    })->get();
+
+    // Statistik
+    $totalProduk = $products->count();
+    $totalStok = $products->sum('stok');
+    $totalNilaiStok = $products->sum(function ($item) {
+        return $item->harga * $item->stok;
+    });
+
+    return view('products.index', compact(
+        'products',
+        'totalProduk',
+        'totalStok',
+        'totalNilaiStok'
+    ));
+
+}
     /**
      * Show the form for creating a new resource.
      */
@@ -88,5 +108,14 @@ class ProductControllers extends Controller
         $product =\App\Models\Product::findOrFail($id);
         $product->delete();
         return redirect()->route('products.index')->with('success','barang berhasil dihapus');
+    }
+
+    //fungsi download pdf
+    public function downloadPdf(){
+        //ambl semua data tabel products
+        $products = \App\Models\product::all();
+        //muat halaman view khusus (html+css)dan gunakan products
+        $pdf = Pdf::loadView('products.product_pdf', compact('products'));
+        return $pdf->download('Laporan-Data-Produk-Garskincell.pdf');
     }
 }
